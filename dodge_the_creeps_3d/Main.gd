@@ -4,19 +4,14 @@ export(PackedScene) var player_scene
 
 func _ready():
 	randomize()
-	
-func _unhandled_input(event):
-	if event.is_action_pressed("ui_accept") and $UserInterface/Retry.visible:
-		# warning-ignore:return_value_discarded
-		get_tree().reload_current_scene()
+	var _timer = Timer.new()
+	add_child(_timer)
+	_timer.connect("timeout", self, "spawn_player")
+	_timer.set_wait_time(1)
+	_timer.set_one_shot(false)
+	_timer.start()
  
-func _on_PlayerTimer_timeout():
-	for i in 10:
-		var player=player_scene.instance()
-		var player_spawn_location = get_node("Player")
-		var vector=Vector3()
-		vector.x=i
-		vector.y=i
-		vector.z=i
-		player.transform.origin =Vector3.ZERO + vector
-		add_child(player)
+func spawn_player():
+	var player=player_scene.instance()
+	player.transform.origin = Vector3.ZERO #Vector3(randf()*100-50,randf()*100-50,randf()*100-50)
+	add_child(player)

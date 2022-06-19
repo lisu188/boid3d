@@ -68,7 +68,7 @@ script = ExtResource( 5 )
 [node name="InnerGimbal" type="Spatial" parent="CameraGimbal"]
 
 [node name="Camera" type="Camera" parent="CameraGimbal/InnerGimbal"]
-transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 4 )
+transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 5 )
 far = 9.22337e+18
 
 [node name="UserInterface" type="Control" parent="."]
@@ -76,9 +76,3 @@ anchor_right = 2.667
 anchor_bottom = 2.0
 margin_right = -0.23999
 theme = ExtResource( 7 )
-
-[node name="PlayerTimer" type="Timer" parent="."]
-one_shot = true
-autostart = true
-
-[connection signal="timeout" from="PlayerTimer" to="." method="_on_PlayerTimer_timeout"]
