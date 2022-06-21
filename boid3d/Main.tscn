@@ -68,7 +68,6 @@ script = ExtResource( 5 )
 [node name="InnerGimbal" type="Spatial" parent="CameraGimbal"]
 
 [node name="Camera" type="Camera" parent="CameraGimbal/InnerGimbal"]
-transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 5 )
 far = 9.22337e+18
 
 [node name="UserInterface" type="Control" parent="."]
