@@ -1,16 +1,17 @@
 extends Spatial
 
-var DISTANCE=15
+export var DISTANCE = 15.0
 
 # How fast the player moves in meters per second.
-var INITAL_SPEED = 0.1
-var MAX_SPEED = 1
+export var INITAL_SPEED = 0.1
+export var MAX_SPEED = 1.0
 
-var KEEP_TOGETHER_WEIGHT=1/2
-var AVERAGE_VELOCITY_WEIGHT=1/4
-var MOVE_AWAY_WEIGHT=1/2
+export var KEEP_TOGETHER_WEIGHT = 0.5
+export var AVERAGE_VELOCITY_WEIGHT = 0.25
+export var MOVE_AWAY_WEIGHT = 0.5
+export var SEPARATION_RADIUS = 6.0
 
-var AREA_SIZE=25
+export var AREA_SIZE = 25.0
 
 var velocity = Vector3.ZERO
 
@@ -22,6 +23,7 @@ func _ready():
 #	_timer.set_one_shot(false) # Make sure it loops
 #	_timer.start()
 	randomize_velocity()
+	add_to_group("boid")
 	
 func randomize_velocity():
 	velocity.x=(randf()-0.5)*INITAL_SPEED
@@ -30,9 +32,9 @@ func randomize_velocity():
 	
 func _physics_process(delta):
 	if velocity!=Vector3.ZERO:
-		$Pivot.look_at(translation + velocity.normalized(), Vector3.ONE)
+		$Pivot.look_at(translation + velocity.normalized(), Vector3.UP)
 	
-	self.transform.origin+=velocity;
+	self.transform.origin += velocity * delta
 	
 	recalculate_velocity()
 	
@@ -62,29 +64,36 @@ func bounce_off():
 	
 
 func recalculate_velocity():
-	var count=0
-	var keep_together=Vector3.ZERO
-	var move_away=Vector3.ZERO
-	var average_velocity=Vector3.ZERO
+	var count = 0
+	var keep_together = Vector3.ZERO
+	var move_away = Vector3.ZERO
+	var average_velocity = Vector3.ZERO
 	
 	for child in get_parent().get_children():
-		if child.get_name().find("Player")!=-1:
-			if(child.transform.origin.distance_to(	self.transform.origin)<DISTANCE):
-				count+=1
-				keep_together+=child.transform.origin
-				move_away+=self.transform.origin-child.transform.origin
-				average_velocity+=child.velocity
+		if child == self:
+			continue
+		if not child.is_in_group("boid"):
+			continue
+		var distance_to_neighbor = child.transform.origin.distance_to(self.transform.origin)
+		if distance_to_neighbor < DISTANCE:
+			count += 1
+			keep_together += child.transform.origin
+			average_velocity += child.velocity
+
+			if distance_to_neighbor < SEPARATION_RADIUS and distance_to_neighbor > 0.001:
+				move_away += (self.transform.origin - child.transform.origin) / distance_to_neighbor
 	
 	if count>0:
-		keep_together=keep_together/count
-		keep_together=keep_together-self.transform.origin
+		keep_together = keep_together / count
+		keep_together = keep_together - self.transform.origin
 				
-		average_velocity/=count
-		average_velocity=average_velocity-self.velocity
+		average_velocity /= count
+		average_velocity = average_velocity - self.velocity
+		move_away /= count
 		
-		self.velocity=self.velocity+keep_together*KEEP_TOGETHER_WEIGHT+move_away*MOVE_AWAY_WEIGHT+average_velocity*AVERAGE_VELOCITY_WEIGHT
+		self.velocity = self.velocity + keep_together * KEEP_TOGETHER_WEIGHT + move_away * MOVE_AWAY_WEIGHT + average_velocity * AVERAGE_VELOCITY_WEIGHT
 		if self.velocity.length() > MAX_SPEED:
-			self.velocity=self.velocity/self.velocity.length() * MAX_SPEED
+			self.velocity = self.velocity / self.velocity.length() * MAX_SPEED
 				
 
 	
