@@ -3,8 +3,8 @@ extends Spatial
 export var DISTANCE = 15.0
 
 # How fast the player moves in meters per second.
-export var INITAL_SPEED = 0.1
-export var MAX_SPEED = 1.0
+var INITAL_SPEED = 0.35
+var MAX_SPEED = 2.5
 
 export var KEEP_TOGETHER_WEIGHT = 0.5
 export var AVERAGE_VELOCITY_WEIGHT = 0.25
