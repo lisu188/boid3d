@@ -17,6 +17,19 @@ extends Node3D
 
 var zoom = 1.5
 
+func _ready():
+	if mouse_control:
+		Input.set_mouse_mode(Input.MOUSE_MODE_CAPTURED)
+
+
+func _input(event):
+	if !mouse_control:
+		return
+	if event.is_action_pressed("ui_cancel"):
+		Input.set_mouse_mode(Input.MOUSE_MODE_VISIBLE)
+	elif event is InputEventMouseButton and event.pressed:
+		Input.set_mouse_mode(Input.MOUSE_MODE_CAPTURED)
+
 func _unhandled_input(event):
 	if Input.get_mouse_mode() != Input.MOUSE_MODE_CAPTURED:
 		return
@@ -52,8 +65,7 @@ func get_input_keyboard(delta):
 	$InnerGimbal.rotate_object_local(Vector3.RIGHT, x_rotation * rotation_speed * delta)
 
 func _process(delta):
-	if !mouse_control:
-		get_input_keyboard(delta)
+	get_input_keyboard(delta)
 	#$InnerGimbal.rotation.x = clamp($InnerGimbal.rotation.x, -1.4, -0.01)
 	scale = lerp(scale, Vector3.ONE * zoom, zoom_speed)
 	if target:
