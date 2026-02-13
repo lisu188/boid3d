@@ -1,6 +1,8 @@
 extends Node
 
 export(PackedScene) var player_scene
+export(int) var boid_count = 500
+export var spawn_range = 25.0
 
 func _ready():
 	randomize()
@@ -10,10 +12,14 @@ func _ready():
 #	_timer.set_wait_time(1)
 #	_timer.set_one_shot(false)
 #	_timer.start()
-	for i in 50:
+	for i in boid_count:
 		spawn_player()
  
 func spawn_player():
 	var player=player_scene.instance()
-	player.transform.origin = Vector3(randf()*100-50,randf()*100-50,randf()*100-50)
+	player.transform.origin = Vector3(
+		randf() * spawn_range * 2.0 - spawn_range,
+		randf() * spawn_range * 2.0 - spawn_range,
+		randf() * spawn_range * 2.0 - spawn_range
+	)
 	add_child(player)
