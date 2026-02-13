@@ -18,6 +18,7 @@ var AREA_SIZE = 25
 var velocity = Vector3.ZERO
 
 func _ready():
+	add_to_group("boid")
 #	var _timer = Timer.new()
 #	add_child(_timer)
 #	_timer.connect("timeout", self, "recalculate_velocity")
@@ -70,18 +71,19 @@ func recalculate_velocity(delta):
 	var keep_together=Vector3.ZERO
 	var move_away=Vector3.ZERO
 	var average_velocity=Vector3.ZERO
+	var main = get_parent()
+	var neighbors = main.get_neighbors(self.transform.origin, NEIGHBOR_DISTANCE)
 
-	for child in get_parent().get_children():
+	for child in neighbors:
 		if child == self:
 			continue
-		if child.get_name().find("Player")!=-1:
-			var neighbor_distance = child.transform.origin.distance_to(self.transform.origin)
-			if(neighbor_distance<NEIGHBOR_DISTANCE):
-				count+=1
-				keep_together+=child.transform.origin
-				if neighbor_distance < SEPARATION_DISTANCE and neighbor_distance > 0.001:
-					move_away += (self.transform.origin - child.transform.origin).normalized() * ((SEPARATION_DISTANCE - neighbor_distance) / SEPARATION_DISTANCE)
-				average_velocity+=child.velocity
+		var neighbor_distance = child.transform.origin.distance_to(self.transform.origin)
+		if(neighbor_distance<NEIGHBOR_DISTANCE):
+			count+=1
+			keep_together+=child.transform.origin
+			if neighbor_distance < SEPARATION_DISTANCE and neighbor_distance > 0.001:
+				move_away += (self.transform.origin - child.transform.origin).normalized() * ((SEPARATION_DISTANCE - neighbor_distance) / SEPARATION_DISTANCE)
+			average_velocity+=child.velocity
 
 	if count>0:
 		keep_together=keep_together/count
