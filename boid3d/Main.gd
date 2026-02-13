@@ -1,6 +1,7 @@
 extends Node
 
 export(PackedScene) var player_scene
+export(int) var boid_count = 500
 
 func _ready():
 	randomize()
@@ -10,7 +11,7 @@ func _ready():
 #	_timer.set_wait_time(1)
 #	_timer.set_one_shot(false)
 #	_timer.start()
-	for i in 50:
+	for i in boid_count:
 		spawn_player()
  
 func spawn_player():
