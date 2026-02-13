@@ -34,22 +34,12 @@ func randomize_velocity():
 		velocity = velocity.normalized() * MIN_SPEED
 
 func _physics_process(delta):
-	if velocity!=Vector3.ZERO:
-<<<<<<< Updated upstream
-		$Pivot.look_at(translation + velocity.normalized(), Vector3.ONE)
+	if velocity != Vector3.ZERO:
+		$Pivot.look_at(position + velocity.normalized(), Vector3.ONE)
 
 	self.transform.origin += velocity * delta
 
 	recalculate_velocity(delta)
-
-=======
-		$Pivot.look_at(position + velocity.normalized(), Vector3.ONE)
-	
-	self.transform.origin+=velocity;
-	
-	recalculate_velocity()
-	
->>>>>>> Stashed changes
 	bounce_off()
 	
 func bounce_off():
