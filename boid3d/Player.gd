@@ -1,14 +1,17 @@
 extends Spatial
 
-var DISTANCE=15
+var NEIGHBOR_DISTANCE = 20.0
+var SEPARATION_DISTANCE = 6.0
 
 # How fast the player moves in meters per second.
-var INITAL_SPEED = 0.1
-var MAX_SPEED = 1
+var INITIAL_SPEED = 4.0
+var MIN_SPEED = 3.0
+var MAX_SPEED = 8.0
+var MAX_FORCE = 0.35
 
-var KEEP_TOGETHER_WEIGHT=1/2
-var AVERAGE_VELOCITY_WEIGHT=1/4
-var MOVE_AWAY_WEIGHT=1/2
+var KEEP_TOGETHER_WEIGHT = 0.8
+var AVERAGE_VELOCITY_WEIGHT = 1.1
+var MOVE_AWAY_WEIGHT = 1.6
 
 var AREA_SIZE=25
 
@@ -24,18 +27,20 @@ func _ready():
 	randomize_velocity()
 	
 func randomize_velocity():
-	velocity.x=(randf()-0.5)*INITAL_SPEED
-	velocity.y=(randf()-0.5)*INITAL_SPEED
-	velocity.z=(randf()-0.5)*INITAL_SPEED
-	
+	velocity.x=(randf()-0.5)*INITIAL_SPEED
+	velocity.y=(randf()-0.5)*INITIAL_SPEED
+	velocity.z=(randf()-0.5)*INITIAL_SPEED
+	if velocity.length() < MIN_SPEED:
+		velocity = velocity.normalized() * MIN_SPEED
+
 func _physics_process(delta):
 	if velocity!=Vector3.ZERO:
 		$Pivot.look_at(translation + velocity.normalized(), Vector3.ONE)
-	
-	self.transform.origin+=velocity;
-	
-	recalculate_velocity()
-	
+
+	self.transform.origin += velocity * delta
+
+	recalculate_velocity(delta)
+
 	bounce_off()
 	
 func bounce_off():
@@ -61,30 +66,41 @@ func bounce_off():
 			self.velocity.z=-self.velocity.z
 	
 
-func recalculate_velocity():
+func recalculate_velocity(delta):
 	var count=0
 	var keep_together=Vector3.ZERO
 	var move_away=Vector3.ZERO
 	var average_velocity=Vector3.ZERO
-	
+
 	for child in get_parent().get_children():
+		if child == self:
+			continue
 		if child.get_name().find("Player")!=-1:
-			if(child.transform.origin.distance_to(	self.transform.origin)<DISTANCE):
+			var neighbor_distance = child.transform.origin.distance_to(self.transform.origin)
+			if(neighbor_distance<NEIGHBOR_DISTANCE):
 				count+=1
 				keep_together+=child.transform.origin
-				move_away+=self.transform.origin-child.transform.origin
+				if neighbor_distance < SEPARATION_DISTANCE and neighbor_distance > 0.001:
+					move_away += (self.transform.origin - child.transform.origin).normalized() * ((SEPARATION_DISTANCE - neighbor_distance) / SEPARATION_DISTANCE)
 				average_velocity+=child.velocity
-	
+
 	if count>0:
 		keep_together=keep_together/count
-		keep_together=keep_together-self.transform.origin
-				
+		keep_together=(keep_together-self.transform.origin).normalized()
+
 		average_velocity/=count
-		average_velocity=average_velocity-self.velocity
-		
-		self.velocity=self.velocity+keep_together*KEEP_TOGETHER_WEIGHT+move_away*MOVE_AWAY_WEIGHT+average_velocity*AVERAGE_VELOCITY_WEIGHT
-		if self.velocity.length() > MAX_SPEED:
-			self.velocity=self.velocity/self.velocity.length() * MAX_SPEED
+		average_velocity=(average_velocity.normalized() - self.velocity.normalized())
+
+		var steering = keep_together * KEEP_TOGETHER_WEIGHT + move_away * MOVE_AWAY_WEIGHT + average_velocity * AVERAGE_VELOCITY_WEIGHT
+		if steering.length() > MAX_FORCE:
+			steering = steering.normalized() * MAX_FORCE
+
+		self.velocity += steering * delta * 60.0
+
+	if self.velocity.length() > MAX_SPEED:
+		self.velocity=self.velocity.normalized() * MAX_SPEED
+	elif self.velocity.length() < MIN_SPEED:
+		self.velocity=self.velocity.normalized() * MIN_SPEED
 				
 
 	
