@@ -1,4 +1,4 @@
-extends Spatial
+extends Node3D
 
 var NEIGHBOR_DISTANCE = 20.0
 var SEPARATION_DISTANCE = 6.0
@@ -35,12 +35,21 @@ func randomize_velocity():
 
 func _physics_process(delta):
 	if velocity!=Vector3.ZERO:
+<<<<<<< Updated upstream
 		$Pivot.look_at(translation + velocity.normalized(), Vector3.ONE)
 
 	self.transform.origin += velocity * delta
 
 	recalculate_velocity(delta)
 
+=======
+		$Pivot.look_at(position + velocity.normalized(), Vector3.ONE)
+	
+	self.transform.origin+=velocity;
+	
+	recalculate_velocity()
+	
+>>>>>>> Stashed changes
 	bounce_off()
 	
 func bounce_off():

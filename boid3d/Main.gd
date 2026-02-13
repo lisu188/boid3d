@@ -1,8 +1,12 @@
 extends Node
 
+<<<<<<< Updated upstream
 export(PackedScene) var player_scene
 export(int) var boid_count = 500
 export var spawn_range = 25.0
+=======
+@export var player_scene: PackedScene
+>>>>>>> Stashed changes
 
 func _ready():
 	randomize()
@@ -16,10 +20,15 @@ func _ready():
 		spawn_player()
  
 func spawn_player():
+<<<<<<< Updated upstream
 	var player=player_scene.instance()
 	player.transform.origin = Vector3(
 		randf() * spawn_range * 2.0 - spawn_range,
 		randf() * spawn_range * 2.0 - spawn_range,
 		randf() * spawn_range * 2.0 - spawn_range
 	)
+=======
+	var player=player_scene.instantiate()
+	player.transform.origin = Vector3(randf()*100-50,randf()*100-50,randf()*100-50)
+>>>>>>> Stashed changes
 	add_child(player)

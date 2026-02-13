@@ -6,10 +6,10 @@
 [ext_resource path="res://CameraGimbal.gd" type="Script" id=5]
 [ext_resource path="res://ui_theme.tres" type="Theme" id=7]
 
-[sub_resource type="SphereShape" id=1]
+[sub_resource type="SphereShape3D" id=1]
 radius = 0.792278
 
-[sub_resource type="CylinderShape" id=2]
+[sub_resource type="CylinderShape3D" id=2]
 radius = 0.907607
 height = 0.1438
 
@@ -17,14 +17,14 @@ height = 0.1438
 length = 1.2
 loop = true
 tracks/0/type = "value"
-tracks/0/path = NodePath("Pivot/Character:translation")
+tracks/0/path = NodePath("Pivot/Character:position")
 tracks/0/interp = 1
 tracks/0/loop_wrap = true
 tracks/0/imported = false
 tracks/0/enabled = true
 tracks/0/keys = {
-"times": PoolRealArray( 0.22, 0.7, 1.18 ),
-"transitions": PoolRealArray( 0.435275, 2.21914, 1 ),
+"times": PackedFloat32Array( 0.22, 0.7, 1.18 ),
+"transitions": PackedFloat32Array( 0.435275, 2.21914, 1 ),
 "update": 0,
 "values": [ Vector3( 0, 0.329753, 0 ), Vector3( 0, 0.660351, 0 ), Vector3( 0, 0.349734, 0 ) ]
 }
@@ -35,8 +35,8 @@ tracks/1/loop_wrap = true
 tracks/1/imported = false
 tracks/1/enabled = true
 tracks/1/keys = {
-"times": PoolRealArray( 0.1, 0.46, 1.18 ),
-"transitions": PoolRealArray( 0.482968, 0.535887, 1 ),
+"times": PackedFloat32Array( 0.1, 0.46, 1.18 ),
+"transitions": PackedFloat32Array( 0.482968, 0.535887, 1 ),
 "update": 0,
 "values": [ Vector3( -5.0326, 0, 0 ), Vector3( 10, 0, 0 ), Vector3( -10, 0, 0 ) ]
 }
@@ -44,13 +44,13 @@ tracks/1/keys = {
 [sub_resource type="PackedScene" id=4]
 _bundled = {
 "conn_count": 1,
-"conns": PoolIntArray( 4, 0, 18, 17, 2, 0 ),
+"conns": PackedInt32Array( 4, 0, 18, 17, 2, 0 ),
 "editable_instances": [  ],
-"names": PoolStringArray( "Player", "collision_mask", "script", "KinematicBody", "Pivot", "Spatial", "Character", "transform", "CollisionShape", "shape", "MobDetector", "collision_layer", "monitorable", "Area", "AnimationPlayer", "autoplay", "anims/float", "_on_MobDetector_body_entered", "body_entered" ),
+"names": PackedStringArray( "Player", "collision_mask", "script", "CharacterBody3D", "Pivot", "Node3D", "Character", "transform", "CollisionShape3D", "shape", "MobDetector", "collision_layer", "monitorable", "Area3D", "AnimationPlayer", "autoplay", "anims/float", "_on_MobDetector_body_entered", "body_entered" ),
 "node_count": 7,
 "node_paths": [  ],
-"nodes": PoolIntArray( -1, -1, 3, 0, -1, 2, 1, 0, 2, 1, 0, 0, 0, 5, 4, -1, 0, 0, 1, 0, 2147483647, 6, 2, 1, 7, 3, 0, 0, 0, 8, 8, -1, 2, 7, 4, 9, 5, 0, 0, 0, 13, 10, -1, 3, 11, 6, 1, 7, 12, 8, 0, 4, 0, 8, 8, -1, 2, 7, 9, 9, 10, 0, 0, 0, 14, 14, -1, 2, 15, 11, 16, 12, 0 ),
-"variants": [ 2147483654, ExtResource( 3 ), ExtResource( 4 ), Transform( 1, 0, 0, 0, 0.987214, 0.1594, 0, -0.1594, 0.987214, 0, 0.348069, 0 ), Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.771765, 0 ), SubResource( 1 ), 0, 2, false, Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.06491, 0 ), SubResource( 2 ), "float", SubResource( 3 ) ],
+"nodes": PackedInt32Array( -1, -1, 3, 0, -1, 2, 1, 0, 2, 1, 0, 0, 0, 5, 4, -1, 0, 0, 1, 0, 2147483647, 6, 2, 1, 7, 3, 0, 0, 0, 8, 8, -1, 2, 7, 4, 9, 5, 0, 0, 0, 13, 10, -1, 3, 11, 6, 1, 7, 12, 8, 0, 4, 0, 8, 8, -1, 2, 7, 9, 9, 10, 0, 0, 0, 14, 14, -1, 2, 15, 11, 16, 12, 0 ),
+"variants": [ 2147483654, ExtResource( 3 ), ExtResource( 4 ), Transform3D( 1, 0, 0, 0, 0.987214, 0.1594, 0, -0.1594, 0.987214, 0, 0.348069, 0 ), Transform3D( 1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.771765, 0 ), SubResource( 1 ), 0, 2, false, Transform3D( 1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.06491, 0 ), SubResource( 2 ), "float", SubResource( 3 ) ],
 "version": 2
 }
 
@@ -58,20 +58,20 @@ _bundled = {
 script = ExtResource( 1 )
 player_scene = SubResource( 4 )
 
-[node name="DirectionalLight" type="DirectionalLight" parent="."]
-transform = Transform( 0.5, -0.777048, 0.382356, 0, 0.441506, 0.897258, -0.866025, -0.448629, 0.220753, 0.144855, 12.5592, 15.3163 )
+[node name="DirectionalLight3D" type="DirectionalLight3D" parent="."]
+transform = Transform3D( 0.5, -0.777048, 0.382356, 0, 0.441506, 0.897258, -0.866025, -0.448629, 0.220753, 0.144855, 12.5592, 15.3163 )
 shadow_enabled = true
 
-[node name="CameraGimbal" type="Spatial" parent="."]
+[node name="CameraGimbal" type="Node3D" parent="."]
 script = ExtResource( 5 )
 
-[node name="InnerGimbal" type="Spatial" parent="CameraGimbal"]
+[node name="InnerGimbal" type="Node3D" parent="CameraGimbal"]
 
-[node name="Camera" type="Camera" parent="CameraGimbal/InnerGimbal"]
+[node name="Camera3D" type="Camera3D" parent="CameraGimbal/InnerGimbal"]
 far = 9.22337e+18
 
 [node name="UserInterface" type="Control" parent="."]
 anchor_right = 2.667
 anchor_bottom = 2.0
-margin_right = -0.23999
+offset_right = -0.23999
 theme = ExtResource( 7 )
