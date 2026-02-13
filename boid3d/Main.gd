@@ -1,6 +1,7 @@
 extends Node
 
 export(PackedScene) var player_scene
+export var spawn_range = 25.0
 
 func _ready():
 	randomize()
@@ -15,5 +16,9 @@ func _ready():
  
 func spawn_player():
 	var player=player_scene.instance()
-	player.transform.origin = Vector3(randf()*100-50,randf()*100-50,randf()*100-50)
+	player.transform.origin = Vector3(
+		randf() * spawn_range * 2.0 - spawn_range,
+		randf() * spawn_range * 2.0 - spawn_range,
+		randf() * spawn_range * 2.0 - spawn_range
+	)
 	add_child(player)
