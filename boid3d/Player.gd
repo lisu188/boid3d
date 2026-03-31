@@ -12,10 +12,14 @@ var MAX_FORCE = 0.35
 var KEEP_TOGETHER_WEIGHT = 0.8
 var AVERAGE_VELOCITY_WEIGHT = 1.1
 var MOVE_AWAY_WEIGHT = 1.6
+var BOUNDARY_WEIGHT = 1.2
+var WANDER_WEIGHT = 0.08
 
 var AREA_SIZE = 25
+var BOUNDARY_MARGIN = 8.0
 
 var velocity = Vector3.ZERO
+var _wander_heading = Vector3.ZERO
 
 func _ready():
 	add_to_group("boid")
@@ -26,45 +30,22 @@ func _ready():
 #	_timer.set_one_shot(false) # Make sure it loops
 #	_timer.start()
 	randomize_velocity()
+	_wander_heading = velocity.normalized()
 	
 func randomize_velocity():
 	velocity.x=(randf()-0.5)*INITIAL_SPEED
 	velocity.y=(randf()-0.5)*INITIAL_SPEED
 	velocity.z=(randf()-0.5)*INITIAL_SPEED
 	if velocity.length() < MIN_SPEED:
-		velocity = velocity.normalized() * MIN_SPEED
+		velocity = Vector3.FORWARD.rotated(Vector3.UP, randf() * TAU).rotated(Vector3.RIGHT, (randf() - 0.5) * PI) * MIN_SPEED
 
 func _physics_process(delta):
 	if velocity != Vector3.ZERO:
-		$Pivot.look_at(position + velocity.normalized(), Vector3.ONE)
+		$Pivot.look_at(position + velocity.normalized(), Vector3.UP)
 
 	self.transform.origin += velocity * delta
 
 	recalculate_velocity(delta)
-	bounce_off()
-	
-func bounce_off():
-	if self.transform.origin.x<-AREA_SIZE:
-		if self.velocity.x <0:
-			self.velocity.x=-self.velocity.x
-	if self.transform.origin.x>AREA_SIZE:
-		if self.velocity.x >0 :
-			self.velocity.x=-self.velocity.x
-		
-	if self.transform.origin.y<-AREA_SIZE:
-		if self.velocity.y <0:
-			self.velocity.y=-self.velocity.y
-	if self.transform.origin.y>AREA_SIZE:
-		if self.velocity.y >0 :
-			self.velocity.y=-self.velocity.y
-		
-	if self.transform.origin.z<-AREA_SIZE:
-		if self.velocity.z<0:
-			self.velocity.z =-self.velocity.z
-	if self.transform.origin.z>AREA_SIZE:
-		if self.velocity.z >0 :
-			self.velocity.z=-self.velocity.z
-	
 
 func recalculate_velocity(delta):
 	var count=0
@@ -85,6 +66,7 @@ func recalculate_velocity(delta):
 				move_away += (self.transform.origin - child.transform.origin).normalized() * ((SEPARATION_DISTANCE - neighbor_distance) / SEPARATION_DISTANCE)
 			average_velocity+=child.velocity
 
+	var steering = Vector3.ZERO
 	if count>0:
 		keep_together=keep_together/count
 		keep_together=(keep_together-self.transform.origin).normalized()
@@ -92,13 +74,50 @@ func recalculate_velocity(delta):
 		average_velocity/=count
 		average_velocity=(average_velocity.normalized() - self.velocity.normalized())
 
-		var steering = keep_together * KEEP_TOGETHER_WEIGHT + move_away * MOVE_AWAY_WEIGHT + average_velocity * AVERAGE_VELOCITY_WEIGHT
-		if steering.length() > MAX_FORCE:
-			steering = steering.normalized() * MAX_FORCE
+		steering += keep_together * KEEP_TOGETHER_WEIGHT
+		steering += move_away * MOVE_AWAY_WEIGHT
+		steering += average_velocity * AVERAGE_VELOCITY_WEIGHT
 
-		self.velocity += steering * delta * 60.0
+	steering += _get_boundary_steering()
+	steering += _get_wander_steering(delta)
+
+	if steering.length() > MAX_FORCE:
+		steering = steering.normalized() * MAX_FORCE
+
+	self.velocity += steering * delta * 60.0
 
 	if self.velocity.length() > MAX_SPEED:
 		self.velocity=self.velocity.normalized() * MAX_SPEED
 	elif self.velocity.length() < MIN_SPEED:
 		self.velocity=self.velocity.normalized() * MIN_SPEED
+
+
+func _get_boundary_steering():
+	var position = self.transform.origin
+	var desired = Vector3.ZERO
+
+	if position.x < -AREA_SIZE + BOUNDARY_MARGIN:
+		desired.x += 1.0
+	elif position.x > AREA_SIZE - BOUNDARY_MARGIN:
+		desired.x -= 1.0
+
+	if position.y < -AREA_SIZE + BOUNDARY_MARGIN:
+		desired.y += 1.0
+	elif position.y > AREA_SIZE - BOUNDARY_MARGIN:
+		desired.y -= 1.0
+
+	if position.z < -AREA_SIZE + BOUNDARY_MARGIN:
+		desired.z += 1.0
+	elif position.z > AREA_SIZE - BOUNDARY_MARGIN:
+		desired.z -= 1.0
+
+	if desired == Vector3.ZERO:
+		return Vector3.ZERO
+
+	return desired.normalized() * BOUNDARY_WEIGHT
+
+
+func _get_wander_steering(delta):
+	var random_offset = Vector3(randf() - 0.5, randf() - 0.5, randf() - 0.5) * delta * 2.0
+	_wander_heading = (_wander_heading + random_offset).normalized()
+	return _wander_heading * WANDER_WEIGHT
