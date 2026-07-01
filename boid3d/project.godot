@@ -121,5 +121,4 @@ cam_zoom_out={
 
 [rendering]
 
-vram_compression/import_etc=true
-quality/filters/msaa=3
+anti_aliasing/quality/msaa_3d=2

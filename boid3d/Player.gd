@@ -41,7 +41,11 @@ func randomize_velocity():
 
 func _physics_process(delta):
 	if velocity != Vector3.ZERO:
-		$Pivot.look_at(position + velocity.normalized(), Vector3.UP)
+		var heading = velocity.normalized()
+		# Pick an up vector that isn't parallel to the heading, otherwise
+		# look_at() fails when a boid moves nearly straight up or down.
+		var up = Vector3.UP if abs(heading.dot(Vector3.UP)) < 0.99 else Vector3.FORWARD
+		$Pivot.look_at(position + heading, up)
 
 	self.transform.origin += velocity * delta
 
