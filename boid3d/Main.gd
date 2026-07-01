@@ -6,6 +6,7 @@ extends Node
 @export var neighbor_cell_size: float = 20.0
 
 var _spatial_hash := {}
+var _flock_center := Vector3.ZERO
 
 func _ready():
 	randomize()
@@ -40,30 +41,35 @@ func get_neighbors(origin: Vector3, radius: float):
 	for x in range(center.x - radius_cells, center.x + radius_cells + 1):
 		for y in range(center.y - radius_cells, center.y + radius_cells + 1):
 			for z in range(center.z - radius_cells, center.z + radius_cells + 1):
-				var key = "%s:%s:%s" % [x, y, z]
+				var key = Vector3i(x, y, z)
 				if _spatial_hash.has(key):
 					nearby.append_array(_spatial_hash[key])
 
 	return nearby
 
 
+func get_flock_center() -> Vector3:
+	return _flock_center
+
+
 func _rebuild_spatial_hash():
 	_spatial_hash.clear()
-	for boid in get_tree().get_nodes_in_group("boid"):
-		var key = _to_cell_key(boid.global_transform.origin)
+	var boids = get_tree().get_nodes_in_group("boid")
+	var sum := Vector3.ZERO
+	for boid in boids:
+		var origin = boid.global_transform.origin
+		sum += origin
+		var key = _to_cell(origin)
 		if !_spatial_hash.has(key):
 			_spatial_hash[key] = []
 		_spatial_hash[key].append(boid)
+	if boids.size() > 0:
+		_flock_center = sum / boids.size()
 
 
-func _to_cell(position: Vector3):
+func _to_cell(position: Vector3) -> Vector3i:
 	return Vector3i(
 		int(floor(position.x / neighbor_cell_size)),
 		int(floor(position.y / neighbor_cell_size)),
 		int(floor(position.z / neighbor_cell_size))
 	)
-
-
-func _to_cell_key(position: Vector3):
-	var cell = _to_cell(position)
-	return "%s:%s:%s" % [cell.x, cell.y, cell.z]
