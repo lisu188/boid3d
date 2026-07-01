@@ -1,6 +1,8 @@
 extends Node3D
 
 @export var target: NodePath
+@export var follow_flock: bool = true
+@export var follow_speed: float = 0.05
 
 @export var rotation_speed = PI/2 # (float, 0.0, 2.0)
 
@@ -31,14 +33,12 @@ func _input(event):
 		Input.set_mouse_mode(Input.MOUSE_MODE_CAPTURED)
 
 func _unhandled_input(event):
-	if Input.get_mouse_mode() != Input.MOUSE_MODE_CAPTURED:
-		return
 	if event.is_action_pressed("cam_zoom_in"):
 		zoom -= zoom_speed
 	if event.is_action_pressed("cam_zoom_out"):
 		zoom += zoom_speed
 	zoom = clamp(zoom, min_zoom, max_zoom)
-	if mouse_control and event is InputEventMouseMotion:
+	if mouse_control and Input.get_mouse_mode() == Input.MOUSE_MODE_CAPTURED and event is InputEventMouseMotion:
 		if event.relative.x != 0:
 			var dir = 1 if invert_x else -1
 			rotate_object_local(Vector3.UP, dir * event.relative.x * mouse_sensitivity)
@@ -68,5 +68,9 @@ func _process(delta):
 	get_input_keyboard(delta)
 	#$InnerGimbal.rotation.x = clamp($InnerGimbal.rotation.x, -1.4, -0.01)
 	scale = lerp(scale, Vector3.ONE * zoom, zoom_speed)
-	if target:
+	if follow_flock:
+		var main = get_parent()
+		if main and main.has_method("get_flock_center"):
+			global_transform.origin = global_transform.origin.lerp(main.get_flock_center(), follow_speed)
+	elif target:
 		global_transform.origin = get_node(target).global_transform.origin
