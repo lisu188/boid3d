@@ -20,9 +20,10 @@ script = ExtResource( 5 )
 
 [node name="Camera3D" type="Camera3D" parent="CameraGimbal/InnerGimbal"]
 transform = Transform3D( 1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 30 )
-far = 9.22337e+18
+far = 1000.0
 
 [node name="UserInterface" type="Control" parent="."]
+mouse_filter = 2
 anchor_right = 2.667
 anchor_bottom = 2.0
 offset_right = -0.23999

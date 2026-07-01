@@ -67,10 +67,13 @@ func get_input_keyboard(delta):
 func _process(delta):
 	get_input_keyboard(delta)
 	#$InnerGimbal.rotation.x = clamp($InnerGimbal.rotation.x, -1.4, -0.01)
-	scale = lerp(scale, Vector3.ONE * zoom, zoom_speed)
+	# Frame-rate independent exponential smoothing (weights are calibrated at 60 FPS).
+	var zoom_weight = 1.0 - pow(1.0 - zoom_speed, delta * 60.0)
+	scale = lerp(scale, Vector3.ONE * zoom, zoom_weight)
 	if follow_flock:
 		var main = get_parent()
 		if main and main.has_method("get_flock_center"):
-			global_transform.origin = global_transform.origin.lerp(main.get_flock_center(), follow_speed)
+			var follow_weight = 1.0 - pow(1.0 - follow_speed, delta * 60.0)
+			global_transform.origin = global_transform.origin.lerp(main.get_flock_center(), follow_weight)
 	elif target:
 		global_transform.origin = get_node(target).global_transform.origin
